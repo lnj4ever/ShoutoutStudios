@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from "react";
 import { CATEGORIES, COLLECTIONS, PRODUCTS, TIERS, findCollection, findProduct, money, unitPrice } from "./catalog.js";
 import { COMMERCE, checkoutMode, orderNote, startCheckout } from "./commerce.js";
+import { TYPE_LABEL, checkoutBasket, groupLines, selldoneProduct, takePending, unmappedLines } from "./selldone.js";
 import { useCart } from "./cart.jsx";
 import heroUrl from "./assets/hero.webp";
 import logoFullUrl from "./assets/logo-full.webp";
@@ -294,6 +295,7 @@ export function Product({ id }) {
   }
 
   const limited = TIERS[product.tier].limited;
+  const orderable = checkoutMode() !== "selldone" || !!selldoneProduct(product.id);
   return (
     <section className={`band product${limited ? " limited" : ""}`}>
       <div className="wrap product-grid">
@@ -363,8 +365,9 @@ export function Product({ id }) {
                 </div>
                 {errors.qty ? <span className="err">{errors.qty}</span> : null}
               </div>
-              <Button type="submit">Add to cart · {money(price * qty)}</Button>
+              {orderable ? <Button type="submit">Add to cart · {money(price * qty)}</Button> : <Button to={`partner?interest=${encodeURIComponent(product.name)}`}>Ask about this piece</Button>}
             </div>
+            {!orderable ? <p className="fine">This piece is made to order through a school or program. Ask and we'll set it up for your team.</p> : null}
             <p className="fine">
               {product.deadlineNote
                 ? "Ordering for a specific night? Standard turnaround is 10–14 business days after proof approval. Add the date and we'll tell you right away if it's tight."
@@ -406,7 +409,7 @@ export function CartLines({ compact }) {
     setBusy(true);
     try {
       const r = await startCheckout(cart.lines);
-      if (r === "preview") {
+      if (r === "preview" || r === "checkout-page") {
         cart.setOpen(false);
         go("checkout");
       }
@@ -453,6 +456,10 @@ export function CartLines({ compact }) {
 }
 
 export function CheckoutPreview() {
+  return checkoutMode() === "selldone" ? <Checkout /> : <PreviewCheckout />;
+}
+
+function PreviewCheckout() {
   const cart = useCart();
   return (
     <>
@@ -472,17 +479,170 @@ export function CheckoutPreview() {
   );
 }
 
+const BUYER_KEY = "shoutout-buyer";
+const BUYER_FIELDS = [
+  { key: "email", label: "Email", type: "email", auto: "email", required: true, wide: true },
+  { key: "name", label: "Full name", auto: "name", required: true },
+  { key: "phone", label: "Phone", type: "tel", auto: "tel", required: true },
+];
+const SHIP_FIELDS = [
+  { key: "address", label: "Street address", auto: "address-line1", required: true, wide: true },
+  { key: "unit", label: "Apt or unit", auto: "address-line2" },
+  { key: "city", label: "City", auto: "address-level2", required: true },
+  { key: "state", label: "State (2 letters)", auto: "address-level1", required: true, max: 2 },
+  { key: "postal", label: "ZIP code", auto: "postal-code", required: true, inputMode: "numeric" },
+];
+
+function loadBuyer() {
+  try {
+    return JSON.parse(localStorage.getItem(BUYER_KEY) || "{}");
+  } catch {
+    return {};
+  }
+}
+
+function Checkout() {
+  const cart = useCart();
+  const groups = groupLines(cart.lines);
+  const blocked = unmappedLines(cart.lines);
+  const group = groups[0];
+  const [buyer, setBuyer] = useState(loadBuyer);
+  const [errors, setErrors] = useState({});
+  const [busy, setBusy] = useState(false);
+  const [fail, setFail] = useState("");
+
+  if (!cart.lines.length) {
+    return (
+      <PageIntro eyebrow="Checkout" title="Your cart is empty.">
+        Start with the piece that fits the moment.
+        <span className="block-actions"><Button to="collection/eagles-football-26">Shop Eagles ’26</Button></span>
+      </PageIntro>
+    );
+  }
+
+  const physical = group?.type === "PHYSICAL";
+  const fields = physical ? [...BUYER_FIELDS, ...SHIP_FIELDS] : BUYER_FIELDS;
+  const subtotal = (group?.lines || []).reduce((s, l) => s + unitPrice(findProduct(l.productId), l.selections) * l.qty, 0);
+
+  async function pay(e) {
+    e.preventDefault();
+    const errs = {};
+    fields.forEach((f) => {
+      const v = (buyer[f.key] || "").trim();
+      if (f.required && !v) errs[f.key] = `Add your ${f.label.toLowerCase()}.`;
+      else if (f.type === "email" && v && !/^\S+@\S+\.\S+$/.test(v)) errs[f.key] = "Enter a valid email.";
+      else if (f.key === "state" && v && !/^[A-Za-z]{2}$/.test(v)) errs[f.key] = "Use the 2-letter code, like FL.";
+      else if (f.key === "postal" && v && !/^\d{5}(-\d{4})?$/.test(v)) errs[f.key] = "Enter a 5-digit ZIP.";
+    });
+    setErrors(errs);
+    if (Object.keys(errs).length) {
+      document.getElementById(`b-${Object.keys(errs)[0]}`)?.focus();
+      return;
+    }
+    const clean = Object.fromEntries(Object.entries(buyer).map(([k, v]) => [k, k === "state" ? v.trim().toUpperCase() : v.trim()]));
+    try {
+      localStorage.setItem(BUYER_KEY, JSON.stringify(clean));
+    } catch {
+      /* storage unavailable */
+    }
+    setFail("");
+    setBusy(true);
+    try {
+      const r = await checkoutBasket(group.type, group.lines, clean);
+      if (r === "paid") go("order/success");
+    } catch (err) {
+      setFail(err.message || "Checkout couldn't start.");
+      setBusy(false);
+    }
+  }
+
+  return (
+    <>
+      <PageIntro eyebrow="Checkout" title={physical ? "Where should we send it?" : "Where should we send your cards?"}>
+        {groups.length > 1
+          ? `Printed and digital pieces check out separately. This step covers your ${TYPE_LABEL[group.type]}; you'll finish the ${TYPE_LABEL[groups[1].type]} right after.`
+          : "You'll pay on a secure page, then come straight back here."}
+      </PageIntro>
+      <section className="band tight">
+        <div className="wrap narrow">
+          {blocked.length ? (
+            <p className="err" role="alert">
+              {blocked.map((l) => findProduct(l.productId).name).join(", ")} can't be bought online yet. Remove {blocked.length > 1 ? "them" : "it"} from your cart, or <Link to="partner">ask us about a program order</Link>.
+            </p>
+          ) : null}
+          {group ? (
+            <form onSubmit={pay} noValidate className="order-form">
+              <fieldset className="opt">
+                <legend>Order summary</legend>
+                <ul className="summary">
+                  {group.lines.map((l) => {
+                    const p = findProduct(l.productId);
+                    return (
+                      <li key={l.id}>
+                        <span>{p.name}{p.options.length > 1 || p.options[0].values.length > 1 ? ` · ${Object.values(l.selections).join(", ")}` : ""} × {l.qty}</span>
+                        <strong>{money(unitPrice(p, l.selections) * l.qty)}</strong>
+                      </li>
+                    );
+                  })}
+                </ul>
+                <div className="subtotal"><span>Subtotal</span><strong>{money(subtotal)}</strong></div>
+                <p className="fine">{physical ? "Shipping and tax are added on the payment page." : "Tax, if any, is added on the payment page."}</p>
+              </fieldset>
+              <fieldset className="opt">
+                <legend>{physical ? "Contact and shipping" : "Contact"}</legend>
+                <div className="fields">
+                  {fields.map((f) => (
+                    <div className={`field${f.wide ? " wide" : ""}`} key={f.key}>
+                      <label htmlFor={`b-${f.key}`}>{f.label}{f.required ? <span aria-hidden="true"> *</span> : null}</label>
+                      <input
+                        id={`b-${f.key}`}
+                        type={f.type || "text"}
+                        autoComplete={f.auto}
+                        inputMode={f.inputMode}
+                        maxLength={f.max}
+                        value={buyer[f.key] || ""}
+                        aria-invalid={!!errors[f.key]}
+                        aria-describedby={errors[f.key] ? `b-${f.key}-err` : undefined}
+                        onChange={(e) => setBuyer({ ...buyer, [f.key]: e.target.value })}
+                      />
+                      {errors[f.key] ? <span className="err" id={`b-${f.key}-err`}>{errors[f.key]}</span> : null}
+                    </div>
+                  ))}
+                </div>
+              </fieldset>
+              {fail ? <p className="err" role="alert">{fail}</p> : null}
+              <Button type="submit" disabled={busy || blocked.length > 0}>{busy ? "Opening secure payment…" : "Continue to payment"}</Button>
+              <p className="fine">Payments are processed by our shop platform, Selldone. Part of every Eagles order supports MSD Eagles Football.</p>
+            </form>
+          ) : null}
+          <p><Link to="cart">← Back to cart</Link></p>
+        </div>
+      </section>
+    </>
+  );
+}
+
 export function OrderResult({ ok }) {
   const cart = useCart();
+  const [left, setLeft] = useState(null);
   React.useEffect(() => {
-    if (ok) cart.clear();
+    if (!ok) return;
+    const paid = checkoutMode() === "selldone" ? takePending() : null;
+    if (!paid) {
+      if (checkoutMode() !== "selldone") cart.clear();
+      return;
+    }
+    const remaining = cart.lines.filter((l) => selldoneProduct(l.productId)?.type !== paid);
+    cart.removeMany(cart.lines.filter((l) => selldoneProduct(l.productId)?.type === paid).map((l) => l.id));
+    if (remaining.length) setLeft(remaining.length);
   }, [ok]);
   return (
     <PageIntro eyebrow={ok ? "Order received" : "Checkout cancelled"} title={ok ? "Thank you. Now the good part." : "Your cart is still here."}>
       {ok
-        ? "Watch your inbox for a private link to share photos, stats and the story. We'll send a proof before anything is produced."
+        ? "Your receipt is on its way by email. The program approves names and numbers before anything is produced, and we'll email you when your pieces are ready."
         : "Nothing was charged. Pick up where you left off whenever you're ready."}
-      <span className="block-actions"><Button to={ok ? "shop" : "cart"} variant="secondary">{ok ? "Back to the shop" : "Return to cart"}</Button></span>
+      {left ? <span className="block-actions"><Button to="checkout">Finish checkout for the rest of your cart</Button></span> : null}
+      <span className="block-actions"><Button to={ok ? "collection/eagles-football-26" : "cart"} variant="secondary">{ok ? "Back to Eagles ’26" : "Return to cart"}</Button></span>
     </PageIntro>
   );
 }

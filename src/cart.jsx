@@ -50,6 +50,9 @@ export function CartProvider({ children }) {
       remove(id) {
         setLines((ls) => ls.filter((l) => l.id !== id));
       },
+      removeMany(ids) {
+        setLines((ls) => ls.filter((l) => !ids.includes(l.id)));
+      },
       clear() {
         setLines([]);
       },

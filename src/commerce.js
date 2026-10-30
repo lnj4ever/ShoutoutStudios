@@ -1,5 +1,8 @@
 // Checkout wiring. The cart works today; payment goes live once ONE provider below is filled in.
 //
+// Selldone (current): SELLDONE_ENABLED = true. Checkout runs on the site's #/checkout page and
+//   pays through the Selldone shop. Product ids and the gateway are set in src/selldone.js.
+//
 // Shopify (recommended for physical goods: shipping, tax, order tracking):
 //   1. Create each product + variant in Shopify.
 //   2. Set SHOPIFY_STORE_DOMAIN and add `shopifyVariants` to each product in catalog.js.
@@ -11,13 +14,14 @@
 import { findProduct, unitPrice } from "./catalog.js";
 
 export const COMMERCE = {
+  SELLDONE_ENABLED: true,
   SHOPIFY_STORE_DOMAIN: "", // e.g. "shoutout-studios.myshopify.com"
   STRIPE_ENABLED: false,
   PARTNER_EMAIL: "", // e.g. "partners@shoutoutstudios.com" — partner form opens an email to this address
 };
 
 export const checkoutMode = () =>
-  COMMERCE.SHOPIFY_STORE_DOMAIN ? "shopify" : COMMERCE.STRIPE_ENABLED ? "stripe" : "preview";
+  COMMERCE.SELLDONE_ENABLED ? "selldone" : COMMERCE.SHOPIFY_STORE_DOMAIN ? "shopify" : COMMERCE.STRIPE_ENABLED ? "stripe" : "preview";
 
 const detailsText = (line) =>
   Object.entries(line.details)
@@ -37,6 +41,7 @@ export function orderNote(lines) {
 
 export async function startCheckout(lines) {
   const mode = checkoutMode();
+  if (mode === "selldone") return "checkout-page";
   if (mode === "shopify") {
     const missing = [];
     const items = lines.map((l) => {
