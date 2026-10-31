@@ -1,4 +1,5 @@
-// Product catalog. PRICES ARE PLACEHOLDERS until Shoutout Studios confirms real pricing.
+// Product catalog. Prices aligned to the official Shoutout Studios Photography Service Pricing Sheet (October 2026).
+// Base prices use mid/lower points of published ranges; volume, multi-program, and custom arrangements available on request.
 // When Shopify is connected, add each option's Shopify variant id under `shopifyVariants`
 // (key = option values joined with "|", e.g. "12 cards|Base").
 
@@ -24,15 +25,15 @@ const SCHOOLS = {
 };
 
 // Live school collections. The collection wears the school's colors; the store stays Shoutout.
-// FUNDRAISER_SPLIT is a placeholder until the booster split is written down.
+// Fundraiser: athletic program receives 30% of retail (before tax/shipping). No inventory buy-in required.
 export const COLLECTIONS = [
   {
     id: "eagles-football-26",
     name: "MSD Eagles Football ’26",
     school: SCHOOLS.eagles,
     status: "Live this season",
-    lede: "Every varsity Eagle, captured on the sideline and made collectible. Part of every order goes back to Eagles Football.",
-    fundraiser: "Part of every order supports MSD Eagles Football.",
+    lede: "Every varsity Eagle, captured on the sideline and made collectible. 30% of every order goes back to Eagles Football.",
+    fundraiser: "30% of every order supports MSD Eagles Football (before tax/shipping). No inventory risk for the program.",
     products: ["eagles-digital-single", "eagles-digital-pack", "eagles-base-pack", "eagles-senior-night", "eagles-locker-box"],
   },
 ];
@@ -45,7 +46,7 @@ export const PRODUCTS = [
     name: "Athlete Card Pack",
     tier: "keepsake",
     category: "Trading Cards",
-    price: 39,
+    price: 55,
     tagline: "Their season on a card. A whole stack of them.",
     story:
       "We pick the frame that says the most about their season, set the name, number and stats they earned, and design the card around their school's colors. Enough to keep, trade and send to the grandparents.",
@@ -61,7 +62,7 @@ export const PRODUCTS = [
     name: "Season Recap Poster",
     tier: "keepsake",
     category: "Posters",
-    price: 49,
+    price: 60,
     tagline: "One season, composed on a single page.",
     story:
       "The record, the big nights, the teammates, the final score that mattered. We lay out the season the way a magazine would, so it still reads clearly on a bedroom wall ten years from now.",
@@ -74,7 +75,7 @@ export const PRODUCTS = [
     name: "Framed Keepsake",
     tier: "keepsake",
     category: "Framed Pieces",
-    price: 129,
+    price: 65,
     tagline: "The one frame that holds the whole night.",
     story:
       "A single defining image, matted with the athlete's card and a small engraved plate. Built to hang in a hallway and outlast the jersey.",
@@ -90,7 +91,7 @@ export const PRODUCTS = [
     name: "Senior Night Edition",
     tier: "milestone",
     category: "Collections",
-    price: 189,
+    price: 215,
     tagline: "They'll never have this season again.",
     story:
       "Four years, one walk across the field. The Senior Night Edition gathers the career into a matched set: an edition card marked with the year, a career poster, and a framed print of the night itself.",
@@ -104,7 +105,7 @@ export const PRODUCTS = [
     name: "Championship Collection",
     tier: "milestone",
     category: "Collections",
-    price: 219,
+    price: 215,
     tagline: "For the run you'll talk about forever.",
     story:
       "The bracket, the final, the team photo nobody wanted to leave. A Championship Collection records the title run as it actually happened, with the scores and dates checked against the record.",
@@ -118,7 +119,7 @@ export const PRODUCTS = [
     name: "Captain Edition Cards",
     tier: "milestone",
     category: "Trading Cards",
-    price: 79,
+    price: 95,
     tagline: "For the one the team looked to.",
     story: "A card set that marks the captaincy: the armband, the year, the leadership the stat sheet never shows.",
     includes: ["24 Captain Edition cards", "Captain mark and season year", "Rigid sleeve and storage box"],
@@ -130,7 +131,7 @@ export const PRODUCTS = [
     name: "Shoutout Select Collector Box",
     tier: "select",
     category: "Collections",
-    price: 299,
+    price: 140,
     tagline: "Numbered. Foil-stamped. Made to be kept.",
     story:
       "Our collector edition. A small numbered run of cards with foil and embossed seals, a career poster and a framed print, presented in a keepsake box. Each piece carries its edition number, so the family always knows which one is theirs.",
@@ -143,7 +144,7 @@ export const PRODUCTS = [
     name: "Autograph Edition",
     tier: "select",
     category: "Trading Cards",
-    price: 149,
+    price: 120,
     tagline: "Signed by the athlete. Sealed by us.",
     story:
       "We ship blank-signature cards to the athlete, they sign, we seal and number them. Every autograph is matched to an edition number and a certificate.",
@@ -169,12 +170,12 @@ export const PRODUCTS = [
     name: "Team Card Set",
     tier: "program",
     category: "Team Sets",
-    price: 18,
+    price: 42,
     unit: "per athlete",
     minQty: 15,
     tagline: "Every athlete on the roster. One collection.",
     story:
-      "A full-roster card set in your school's colors, with an athletic director sign-off on every name, number and stat before anything is produced. Each athlete gets their own pack; the program gets the complete set.",
+      "A full-roster card set in your school's colors, with an athletic director sign-off on every name, number and stat before anything is produced. Each athlete gets their own pack; the program gets the complete set. Program earns 30% of retail.",
     includes: ["A card for every rostered athlete", "12 cards per athlete plus one complete team set", "Roster verification by your athletic director", "Program colors and marks, studio-curated layout"],
     options: [{ name: "Finish", values: [{ label: "Base", add: 0 }, { label: "Silver Foil", add: 4 }] }],
     art: { kind: "card", school: SCHOOLS.royal, name: "Lakeview Knights", number: "", sport: "Team Set", pos: "", year: "2026 Roster", focus: "20% 60%" },
@@ -187,7 +188,7 @@ export const PRODUCTS = [
     name: "Eagles Digital Card",
     tier: "digital",
     category: "Digital",
-    price: 9,
+    price: 19,
     tagline: "Friday's frame, on a card, ready to share tonight.",
     story: "One athlete, one game-night photo from the sideline, designed as an official Eagles card. Delivered as a high-resolution download you can post, text to grandparents, or print later.",
     includes: ["One digital card of your athlete", "High-resolution download plus a share-sized version", "Credit toward a print pack within 14 days"],
@@ -202,7 +203,7 @@ export const PRODUCTS = [
     name: "Eagles Digital Team Pack",
     tier: "digital",
     category: "Digital",
-    price: 29,
+    price: 39,
     tagline: "Collect the whole team.",
     story: "Every approved varsity card in the Eagles ’26 set, delivered digitally and updated as new game weeks drop.",
     includes: ["Every approved varsity card", "New cards added through the season", "Your athlete's card featured first"],
@@ -217,7 +218,7 @@ export const PRODUCTS = [
     name: "Eagles Base Card Pack",
     tier: "keepsake",
     category: "Trading Cards",
-    price: 39,
+    price: 49,
     tagline: "The pack to hold, trade and keep.",
     story: "Printed Eagles cards of your athlete on heavyweight stock, in burgundy and gold. Names and numbers are approved by the program before anything prints.",
     includes: ["12 printed cards of your athlete", "Front photo, back with season stats", "Rigid sleeve and storage box"],
@@ -231,7 +232,7 @@ export const PRODUCTS = [
     name: "Eagles Senior Night Set",
     tier: "milestone",
     category: "Collections",
-    price: 79,
+    price: 199,
     tagline: "One walk across the field. Kept for good.",
     story: "A Senior Edition print card set and an 18 × 24 in poster of your senior's night, produced to arrive for the moment rather than after it.",
     includes: ["12 Senior Edition cards marked 2026", "Senior night poster, 18 × 24 in", "Edition seal"],
@@ -246,9 +247,9 @@ export const PRODUCTS = [
     name: "Eagles Team Locker Box",
     tier: "program",
     category: "Team Sets",
-    price: 249,
+    price: 499,
     tagline: "The full roster, boxed for the building.",
-    story: "A complete printed team set and a framed team piece for the locker room or trophy case. A natural fit for a sponsor to present.",
+    story: "A complete printed team set and a framed team piece for the locker room or trophy case. A natural fit for a sponsor to present. Program earns 30% of retail.",
     includes: ["One printed card of every varsity athlete", "Framed team piece, 16 × 20 in", "Optional sponsor credit on the box"],
     options: [{ name: "Sponsor credit", values: [{ label: "None", add: 0 }, { label: "Add sponsor credit", add: 0 }] }],
     fields: "sponsor",
