@@ -37,6 +37,6 @@ Checkout runs through the Selldone shop `shoutout-studios` (see `src/selldone.js
 Before the first real order:
 - Enable the Stripe gateway in the Selldone dashboard (Accounting > Gateways).
 - Add a shipping method that covers your delivery area (the shop only has local Motorbike and Pickup today).
-- Set real prices in Selldone and in `src/catalog.js` (they're placeholders, and the products are Unlisted until then).
+- Set real prices in Selldone and in `src/catalog.js` (the store sells at the low end of each range on the pricing sheet; products are Unlisted in Selldone, which only hides them from the Selldone storefront).
 
-Only the MSD Eagles Football '26 products are sold online; the sample pieces show "Ask about this piece".
+Team Set Fundraiser, Program Season Recap and Sponsor Spotlight are sold by conversation and show "Ask about this piece".

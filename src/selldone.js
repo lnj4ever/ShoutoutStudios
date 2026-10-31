@@ -20,11 +20,20 @@ export const SELLDONE = {
   GATEWAY: "stripe_usd", // must be enabled under Selldone > Accounting > Gateways
   COUNTRY: "US",
   PRODUCTS: {
-    "eagles-digital-single": { id: 737270, type: "SERVICE" },
-    "eagles-digital-pack": { id: 737271, type: "SERVICE" },
-    "eagles-base-pack": { id: 737267, type: "PHYSICAL", variants: { "Pack size": { "12 cards": 1476452, "24 cards": 1476453 } } },
-    "eagles-senior-night": { id: 737268, type: "PHYSICAL", variants: { "Add a frame": { "Poster only": 1476454, "Framed poster": 1476455 } } },
-    "eagles-locker-box": { id: 737269, type: "PHYSICAL" },
+    "player-highlight-card": { id: 737497, type: "PHYSICAL" },
+    "multi-photo-player-card": { id: 737498, type: "PHYSICAL" },
+    "digital-only-pack": { id: 737503, type: "SERVICE" },
+    "premium-legacy-drop": { id: 737499, type: "PHYSICAL" },
+    "framed-poster": { id: 737501, type: "PHYSICAL", variants: { Size: { "8 × 10 in": 1478175, "11 × 14 in": 1478176 } } },
+    "season-recap-collection": { id: 737500, type: "PHYSICAL" },
+    "extra-cards": { id: 737502, type: "PHYSICAL", variants: { Card: { Standard: 1478177, "Multi-photo select": 1478178 } } },
+    "rush-proofing": { id: 737504, type: "SERVICE" },
+    "school-team-poster": { id: 737505, type: "PHYSICAL" },
+    "eagles-digital-only": { id: 737507, type: "SERVICE" },
+    "eagles-player-card": { id: 737506, type: "PHYSICAL" },
+    "eagles-legacy-drop": { id: 737508, type: "PHYSICAL" },
+    "eagles-season-recap": { id: 737509, type: "PHYSICAL" },
+    "eagles-team-poster": { id: 737510, type: "PHYSICAL" },
   },
 };
 

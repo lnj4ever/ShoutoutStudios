@@ -311,7 +311,7 @@ export function Product({ id }) {
   }
 
   const limited = TIERS[product.tier].limited;
-  const orderable = checkoutMode() !== "selldone" || !!selldoneProduct(product.id);
+  const orderable = !product.inquiry && (checkoutMode() !== "selldone" || !!selldoneProduct(product.id));
   return (
     <section className={`band product${limited ? " limited" : ""}`}>
       <div className="wrap product-grid">
@@ -695,15 +695,15 @@ const AUDIENCES = {
     lede: "You've been there since the first practice. Shoutout turns the photos, achievements and moments you're already capturing into collectibles that tell your athlete's story, made to be kept long after the season ends.",
     pillars: [["Celebrate the achievement", "Give meaningful moments the recognition they deserve."], ["Preserve the story", "Turn scattered photos and stats into something coherent and lasting."], ["Make it theirs", "Every piece reflects this athlete, this team, this season."], ["Keep it", "Designed to still matter years from now."]],
     cta: ["shop", "Create a Shoutout"],
-    products: ["senior-night-edition", "athlete-card-pack", "framed-keepsake"],
+    products: ["player-highlight-card", "premium-legacy-drop", "season-recap-collection"],
   },
   programs: {
     eyebrow: "For athletic programs",
     title: "Sell the collection. Fund the program.",
     lede: "Your season becomes an official collection families actually want, and part of every order goes back to your program. A professionally managed way to turn your athletes and seasons into official collections, without internal design resources and without pushing families toward generic merchandise.",
-    pillars: [["A real fundraiser", "A simple split on every order, on one page your booster club can forward. No discount bins."], ["Program identity", "Collections wear your school's colors and marks. Your program is the hero."], ["Family engagement", "Something families value, not another piece of promotional stuff."], ["Professional execution", "We handle the creative system, verification and production."]],
+    pillars: [["A real fundraiser", "Your program earns 30% of retail on every card, with no inventory to buy. One page your booster club can forward. No discount bins."], ["Program identity", "Collections wear your school's colors and marks. Your program is the hero."], ["Family engagement", "Something families value, not another piece of promotional stuff."], ["Professional execution", "We handle the creative system, verification and production."]],
     cta: ["partner?interest=program", "Start a program partnership"],
-    products: ["team-card-set", "championship-collection", "captain-edition"],
+    products: ["team-set-fundraiser", "program-season-recap", "school-team-poster"],
     partner: true,
   },
   sponsors: {
@@ -712,7 +712,7 @@ const AUDIENCES = {
     lede: "A banner hangs on a fence. A social post disappears. Sponsoring a Shoutout collection puts your business behind something families take home and keep.",
     pillars: [["Community association", "Align your business with the recognition of local athletes."], ["Meaningful visibility", "Appear in something valued, not merely viewed."], ["Longevity", "Exposure that lasts beyond a game, an event or a post."], ["Authenticity", "Support the program rather than interrupt its audience."]],
     cta: ["partner?interest=sponsor", "Become a community partner"],
-    products: [],
+    products: ["sponsor-spotlight", "school-team-poster"],
     partner: true,
   },
 };
