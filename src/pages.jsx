@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from "react";
-import { CATEGORIES, COLLECTIONS, PRODUCTS, TIERS, findCollection, findProduct, money, unitPrice } from "./catalog.js";
+import { CATEGORIES, COLLECTIONS, FAMILIES, PRODUCTS, TIERS, findCollection, findProduct, money, unitPrice } from "./catalog.js";
 import { COMMERCE, checkoutMode, orderNote, startCheckout } from "./commerce.js";
 import { TYPE_LABEL, checkoutBasket, groupLines, selldoneProduct, takePending, unmappedLines } from "./selldone.js";
 import { useCart } from "./cart.jsx";
@@ -16,7 +16,6 @@ const STEPS = [
 ];
 
 export function Home() {
-  const featured = ["senior-night-edition", "athlete-card-pack", "framed-keepsake", "season-recap-poster"].map(findProduct);
   return (
     <>
       <section className="hero">
@@ -51,10 +50,10 @@ export function Home() {
 
       <section className="band">
         <div className="wrap">
-          <SectionHead eyebrow="Your story. Made collectible." title="Cards, posters, frames and editions.">
-            Professionally curated around the athlete, never dropped into a template.
+          <SectionHead eyebrow="Every athlete has a story worth collecting" title="Four ways to collect it.">
+            A card is the format. The athlete's story is the content. Our creative direction is what makes it worth keeping.
           </SectionHead>
-          <div className="grid tiles">{featured.map((p) => <ProductTile key={p.id} product={p} />)}</div>
+          <div className="grid tiles">{FAMILIES.map((f) => <FamilyTile key={f.name} family={f} />)}</div>
           <div className="center-row"><Button to="shop" variant="secondary">See the full shop</Button></div>
         </div>
       </section>
@@ -108,6 +107,22 @@ export function Home() {
         </div>
       </section>
     </>
+  );
+}
+
+function FamilyTile({ family: f }) {
+  const p = findProduct(f.feature);
+  const cheapest = PRODUCTS.filter((x) => !x.collection && x.category === f.name).sort((a, b) => a.price - b.price)[0];
+  return (
+    <Link to={`shop?c=${encodeURIComponent(f.name)}`} className="tile family">
+      <div className="tile-art"><CardArt art={p.art} tier={p.tier} /></div>
+      <div className="tile-body">
+        <h3>{f.name}</h3>
+        <p>{f.blurb}</p>
+        <p className="fine">{f.examples}</p>
+        <span className="tile-price">From {money(cheapest.price)}{cheapest.unit ? <small> {cheapest.unit}</small> : null}</span>
+      </div>
+    </Link>
   );
 }
 
@@ -212,6 +227,7 @@ export function Shop({ query }) {
               <button key={c} role="tab" aria-selected={cat === c} className={cat === c ? "on" : ""} onClick={() => setCat(c)}>{c}</button>
             ))}
           </div>
+          {cat !== "All" ? (() => { const f = FAMILIES.find((x) => x.name === cat); return <p className="lede family-lede">{f.blurb} <span className="fine">{f.examples}</span></p>; })() : null}
           {cat === "All" ? (
             <Link to={`collection/${COLLECTIONS[0].id}`} className="collection-strip" style={{ "--c1": COLLECTIONS[0].school.c1, "--c2": COLLECTIONS[0].school.c2 }}>
               <span className="eyebrow live"><span className="dot" aria-hidden="true" />{COLLECTIONS[0].status}</span>
@@ -859,7 +875,7 @@ export function About() {
           <ul className="checks">
             {["Does it recognize the athlete?", "Does it tell a story rather than decorate a photo?", "Does it feel curated rather than templated?", "Does the school or athlete remain the hero?", "Will it still feel meaningful ten years from now?"].map((q) => <li key={q}>{q}</li>)}
           </ul>
-          <p className="signature">Big Exposure Athletics is the Shoutout Studios sports-media team, capturing the moments we make collectible.</p>
+          <p className="signature">Big Exposure Athletics captures the moments. Shoutout Studios curates them into collectibles.</p>
         </div>
       </section>
     </>

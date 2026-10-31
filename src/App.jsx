@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { CartProvider, useCart } from "./cart.jsx";
 import { Link, Wordmark } from "./ui.jsx";
+import { FAMILIES } from "./catalog.js";
 import { About, Audience, CartLines, CartPage, CheckoutPreview, CollectionPage, Home, HowItWorks, NotFound, OrderResult, PartnerPage, Product, Shop } from "./pages.jsx";
 
 const NAV = [
@@ -132,15 +133,11 @@ function Footer() {
         <div>
           <Wordmark />
           <p className="foot-line">Moments happen once. Shoutouts last.</p>
-          <p className="fine">Tag the athlete who's earned theirs.</p>
+          <p className="fine">Every athlete has a story worth collecting.</p>
         </div>
         <div>
           <span className="foot-h">Shop</span>
-          <Link to="shop?c=Trading Cards">Trading cards</Link>
-          <Link to="shop?c=Posters">Posters</Link>
-          <Link to="shop?c=Framed Pieces">Framed pieces</Link>
-          <Link to="shop?c=Collections">Collections</Link>
-          <Link to="shop?c=Team Sets">Team sets</Link>
+          {FAMILIES.map((f) => <Link key={f.name} to={`shop?c=${encodeURIComponent(f.name)}`}>{f.name}</Link>)}
         </div>
         <div>
           <span className="foot-h">Studio</span>
