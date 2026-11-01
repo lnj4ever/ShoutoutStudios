@@ -1,6 +1,6 @@
 // Checkout wiring. The cart works today; payment goes live once ONE provider below is filled in.
 //
-// Selldone (current): SELLDONE_ENABLED = true. Checkout runs on the site's #/checkout page and
+// Selldone (previous): SELLDONE_ENABLED = true. Checkout runs on the site's #/checkout page and
 //   pays through the Selldone shop. Product ids and the gateway are set in src/selldone.js.
 //
 // Shopify (recommended for physical goods: shipping, tax, order tracking):
@@ -15,9 +15,9 @@
 import { findProduct } from "./catalog.js";
 
 export const COMMERCE = {
-  SELLDONE_ENABLED: true,
+  SELLDONE_ENABLED: false, // Selldone checkout kept in src/selldone.js; Stripe direct chosen 2026-11-01
   SHOPIFY_STORE_DOMAIN: "", // e.g. "shoutout-studios.myshopify.com"
-  STRIPE_ENABLED: false,
+  STRIPE_ENABLED: true,
   PARTNER_EMAIL: "", // e.g. "partners@shoutoutstudios.com" — partner form opens an email to this address
 };
 

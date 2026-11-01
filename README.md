@@ -30,13 +30,14 @@ Connect this repo in Cloudflare → Workers & Pages → Create → Import a repo
 
 Still needed before launch: real prices, the Eagles fundraiser split, real photography (the hero is AI-generated), privacy/terms pages, and analytics.
 
-## Selldone checkout
+## Checkout (Stripe)
 
-Checkout runs through the Selldone shop `shoutout-studios` (see `src/selldone.js`). The site's cart is copied into a Selldone guest basket over the Storefront API (`https://xapi.selldone.com`), the buyer's contact and shipping details are saved on it, and Selldone starts payment with the gateway named in `SELLDONE.GATEWAY`.
+Checkout uses Stripe's hosted payment page. The Cloudflare Worker (`worker/index.js`) handles `POST /api/checkout`: it prices every cart line from `src/catalog.js`, so prices can't be changed in the browser, then creates a Stripe Checkout Session and sends the shopper there. Shipping address is collected only when the cart has printed pieces.
 
-Before the first real order:
-- Enable the Stripe gateway in the Selldone dashboard (Accounting > Gateways).
-- Add a shipping method that covers your delivery area (the shop only has local Motorbike and Pickup today).
-- Set real prices in Selldone and in `src/catalog.js` (the store sells at the low end of each range on the pricing sheet; products are Unlisted in Selldone, which only hides them from the Selldone storefront).
+To go live:
+1. In Cloudflare, open the Worker, go to Settings > Variables and Secrets, and add a secret named `STRIPE_SECRET_KEY` (use the `sk_test_...` key first, then the live key).
+2. Place a test order with card 4242 4242 4242 4242.
 
 Team Set Fundraiser, Program Season Recap and Sponsor Spotlight are sold by conversation and show "Ask about this piece".
+
+The earlier Selldone checkout is still in `src/selldone.js`; set `SELLDONE_ENABLED = true` in `src/commerce.js` to switch back.
