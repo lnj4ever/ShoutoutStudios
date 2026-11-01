@@ -28,7 +28,7 @@ Connect this repo in Cloudflare → Workers & Pages → Create → Import a repo
 - `src/assets/` — logo (cut from Shoutout Studios Logo v1; a vector master is still needed for print) and the hero photo.
 - Brand: Ink / Gallery Ivory / Archive Gold, Studio Purple only for limited tiers. Anton + Inter.
 
-Still needed before launch: real prices, the Eagles fundraiser split, real photography (the hero is AI-generated), privacy/terms pages, and analytics.
+Still needed before launch: final ladder prices (supplier quotes), the Eagles per-sale contribution (`contribution` in src/catalog.js), real photography (the hero is AI-generated), privacy/terms pages, and analytics.
 
 ## Checkout (Stripe)
 

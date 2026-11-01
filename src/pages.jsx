@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from "react";
-import { CATEGORIES, COLLECTIONS, FAMILIES, PRODUCTS, TIERS, findCollection, findProduct, money, unitPrice } from "./catalog.js";
+import { CATEGORIES, COLLECTIONS, FAMILIES, PRODUCTS, TIERS, findCollection, findProduct, fundraiserNote, isOrderable, money, priceLabel, unitPrice } from "./catalog.js";
 import { COMMERCE, checkoutMode, orderNote, startCheckout } from "./commerce.js";
 import { TYPE_LABEL, checkoutBasket, groupLines, selldoneProduct, takePending, unmappedLines } from "./selldone.js";
 import { useCart } from "./cart.jsx";
@@ -112,7 +112,7 @@ export function Home() {
 
 function FamilyTile({ family: f }) {
   const p = findProduct(f.feature);
-  const cheapest = PRODUCTS.filter((x) => !x.collection && x.category === f.name).sort((a, b) => a.price - b.price)[0];
+  const cheapest = PRODUCTS.filter((x) => !x.collection && x.category === f.name).sort((a, b) => (a.price ?? Infinity) - (b.price ?? Infinity))[0];
   return (
     <Link to={`shop?c=${encodeURIComponent(f.name)}`} className="tile family">
       <div className="tile-art"><CardArt art={p.art} tier={p.tier} /></div>
@@ -120,7 +120,7 @@ function FamilyTile({ family: f }) {
         <h3>{f.name}</h3>
         <p>{f.blurb}</p>
         <p className="fine">{f.examples}</p>
-        <span className="tile-price">From {money(cheapest.price)}{cheapest.unit ? <small> {cheapest.unit}</small> : null}</span>
+        <span className="tile-price">{cheapest.quote ? cheapest.quote : <>From {money(cheapest.price)}</>}{cheapest.unit ? <small> {cheapest.unit}</small> : null}</span>
       </div>
     </Link>
   );
@@ -167,7 +167,7 @@ export function CollectionPage({ id }) {
       </section>
       <section className="band tight">
         <div className="wrap">
-          <p className="fundraiser-note">{c.fundraiser}</p>
+          <p className="fundraiser-note">{fundraiserNote(c)}</p>
           <div className="grid tiles">{items.map((p) => <ProductTile key={p.id} product={p} />)}</div>
           <p className="fine">Captured on the sideline by Big Exposure Athletics. Every card's name and number is approved by the program before it prints.</p>
         </div>
@@ -289,7 +289,7 @@ export function Product({ id }) {
 
   const fields = FIELD_SETS[product.fields] || (product.tier === "program" ? PROGRAM_FIELDS : DETAIL_FIELDS);
   const collection = product.collection ? findCollection(product.collection) : null;
-  const price = unitPrice(product, sel);
+  const price = product.quote ? 0 : unitPrice(product, sel);
   const min = product.minQty || 1;
 
   function submit(e) {
@@ -311,7 +311,7 @@ export function Product({ id }) {
   }
 
   const limited = TIERS[product.tier].limited;
-  const orderable = !product.inquiry && (checkoutMode() !== "selldone" || !!selldoneProduct(product.id));
+  const orderable = isOrderable(product) && (checkoutMode() !== "selldone" || !!selldoneProduct(product.id));
   return (
     <section className={`band product${limited ? " limited" : ""}`}>
       <div className="wrap product-grid">
@@ -324,11 +324,18 @@ export function Product({ id }) {
           <TierBadge tier={product.tier} />
           <h1>{product.name}</h1>
           <p className="tagline">{product.tagline}</p>
-          <p className="price">{money(price)}{product.unit ? <small> {product.unit}</small> : null}</p>
+          <p className="price">{priceLabel(product, price)}{product.unit ? <small> {product.unit}</small> : null}{product.later ? <small> · opens later</small> : null}</p>
+          {product.later ? <p className="fundraiser-note">{product.later}</p> : null}
           <p>{product.story}</p>
-          {collection ? <p className="fundraiser-note">{collection.fundraiser}</p> : null}
+          {collection ? <p className="fundraiser-note">{fundraiserNote(collection)}</p> : null}
           <ul className="includes">{product.includes.map((i) => <li key={i}>{i}</li>)}</ul>
 
+          {!orderable ? (
+            <div className="order-form">
+              <Button to={`partner?interest=${encodeURIComponent(product.name)}`}>{product.later ? "Tell me when it opens" : "Request a quote"}</Button>
+              <p className="fine">{product.later ? "Leave your details and we'll let you know the day it opens." : "Programs are quoted for your roster. Tell us about your team and we'll send a quote."}</p>
+            </div>
+          ) : (
           <form onSubmit={submit} noValidate className="order-form">
             {product.options.map((o) => (
               <fieldset key={o.name} className="opt">
@@ -381,9 +388,8 @@ export function Product({ id }) {
                 </div>
                 {errors.qty ? <span className="err">{errors.qty}</span> : null}
               </div>
-              {orderable ? <Button type="submit">Add to cart · {money(price * qty)}</Button> : <Button to={`partner?interest=${encodeURIComponent(product.name)}`}>Ask about this piece</Button>}
+              <Button type="submit">Add to cart · {money(price * qty)}</Button>
             </div>
-            {!orderable ? <p className="fine">This piece is made to order through a school or program. Ask and we'll set it up for your team.</p> : null}
             <p className="fine">
               {product.deadlineNote
                 ? "Ordering for a specific night? Standard turnaround is 10–14 business days after proof approval. Add the date and we'll tell you right away if it's tight."
@@ -394,6 +400,7 @@ export function Product({ id }) {
                   : "You'll send photos after checkout through a private upload link. Nothing is produced until you approve the proof."}
             </p>
           </form>
+          )}
         </div>
       </div>
     </section>
@@ -678,7 +685,7 @@ export function HowItWorks() {
             ["How long does it take?", "Most orders ship 10–14 business days after you approve the proof. Senior night or a championship coming up? Add the date when you order and we'll schedule production around it."],
             ["Can I change the design?", "Every order includes a digital proof and one round of revisions. Nothing is produced until you approve it."],
             ["Do you check names and stats?", "Yes. We verify spelling, numbers and statistics against what you send, and team sets are signed off by the athletic director."],
-            ["What makes an edition limited?", "Numbered editions are produced once, in the quantity marked on the card. We don't manufacture rarity. We document significance."],
+            ["What makes an edition limited?", "Shoutout Select and the Founder Edition are our limited tiers. The Founder Edition is offered only during a published launch window, and a piece carries a number only when its edition size is fixed. We don't manufacture rarity. We document significance."],
           ].map(([q, a]) => (
             <details key={q}><summary>{q}</summary><p>{a}</p></details>
           ))}
@@ -695,24 +702,24 @@ const AUDIENCES = {
     lede: "You've been there since the first practice. Shoutout turns the photos, achievements and moments you're already capturing into collectibles that tell your athlete's story, made to be kept long after the season ends.",
     pillars: [["Celebrate the achievement", "Give meaningful moments the recognition they deserve."], ["Preserve the story", "Turn scattered photos and stats into something coherent and lasting."], ["Make it theirs", "Every piece reflects this athlete, this team, this season."], ["Keep it", "Designed to still matter years from now."]],
     cta: ["shop", "Create a Shoutout"],
-    products: ["player-highlight-card", "premium-legacy-drop", "season-recap-collection"],
+    products: ["digital-entry", "signature-package", "story-collection"],
   },
   programs: {
     eyebrow: "For athletic programs",
     title: "Sell the collection. Fund the program.",
     lede: "Your season becomes an official collection families actually want, and part of every order goes back to your program. A professionally managed way to turn your athletes and seasons into official collections, without internal design resources and without pushing families toward generic merchandise.",
-    pillars: [["A real fundraiser", "Your program earns 30% of retail on every card, with no inventory to buy. One page your booster club can forward. No discount bins."], ["Program identity", "Collections wear your school's colors and marks. Your program is the hero."], ["Family engagement", "Something families value, not another piece of promotional stuff."], ["Professional execution", "We handle the creative system, verification and production."]],
+    pillars: [["A real fundraiser", "Families pay the regular price and your agreement sets a dollar contribution to your program for every eligible sale, with no inventory to buy. One page your booster club can forward. No discount bins."], ["Program identity", "Collections wear your school's colors and marks. Your program is the hero."], ["Family engagement", "Something families value, not another piece of promotional stuff."], ["Professional execution", "We handle the creative system, verification and production."]],
     cta: ["partner?interest=program", "Start a program partnership"],
-    products: ["team-set-fundraiser", "program-season-recap", "school-team-poster"],
+    products: ["team-recognition", "season-story-program", "founding-program"],
     partner: true,
   },
   sponsors: {
     eyebrow: "For sponsors & community partners",
     title: "Support something families keep.",
     lede: "A banner hangs on a fence. A social post disappears. Sponsoring a Shoutout collection puts your business behind something families take home and keep.",
-    pillars: [["Community association", "Align your business with the recognition of local athletes."], ["Meaningful visibility", "Appear in something valued, not merely viewed."], ["Longevity", "Exposure that lasts beyond a game, an event or a post."], ["Authenticity", "Support the program rather than interrupt its audience."]],
+    pillars: [["Community association", "Align your business with the recognition of local athletes."], ["Meaningful visibility", "Underwrite packages families take home, and appear in something valued, not merely viewed."], ["Longevity", "Exposure that lasts beyond a game, an event or a post."], ["Authenticity", "Support the program rather than interrupt its audience."]],
     cta: ["partner?interest=sponsor", "Become a community partner"],
-    products: ["sponsor-spotlight", "school-team-poster"],
+    products: ["founding-program", "team-recognition"],
     partner: true,
   },
 };

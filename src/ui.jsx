@@ -61,7 +61,7 @@ export function CardArt({ art, tier, size = "md" }) {
         <div className="poster-type">
           <span className="poster-kicker">{school.school} {school.mascot} · {art.number}</span>
           <span className="poster-title">{art.title}</span>
-          <span className="poster-line">{art.sport} · Season Recap</span>
+          <span className="poster-line">{art.sport}{art.line ? ` · ${art.line}` : ""}</span>
         </div>
         <Seal size={size === "lg" ? 54 : 34} tone={limited ? "purple" : "gold"} />
       </div>
@@ -116,8 +116,9 @@ export function ProductTile({ product }) {
         <h3>{product.name}</h3>
         <p>{product.tagline}</p>
         <span className="tile-price">
-          From {money(product.price)}
+          {product.quote ? product.quote : <>{product.options.some((o) => o.values.length > 1) ? "From " : ""}{money(product.price)}</>}
           {product.unit ? <small> {product.unit}</small> : null}
+          {product.later ? <small> · opens later</small> : null}
         </span>
       </div>
     </Link>

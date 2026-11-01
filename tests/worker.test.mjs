@@ -66,15 +66,17 @@ test("build emits the static site", async () => {
 });
 
 test("prices Stripe lines from the catalog, not the browser", () => {
-  const [item] = stripeLineItems([{ productId: "framed-poster", selections: { Size: "11 × 14 in" }, qty: 2, unitAmount: 1, details: { "Athlete name": "Pat" } }]);
-  assert.equal(item.unitAmount, 7500);
+  const [item] = stripeLineItems([{ productId: "digital-entry", selections: { Format: "Five-card pack" }, qty: 2, unitAmount: 1, details: { "Athlete name": "Pat" } }]);
+  assert.equal(item.unitAmount, 1500);
   assert.equal(item.quantity, 2);
-  assert.equal(item.name, "Framed Poster (11 × 14 in)");
+  assert.equal(item.name, "Digital Card (Five-card pack)");
+  assert.equal(item.shippable, false);
 });
 
-test("rejects inquiry-only products and unknown options", () => {
-  assert.throws(() => stripeLineItems([{ productId: "sponsor-spotlight", selections: { Format: "Sponsor" }, qty: 1 }]));
-  assert.throws(() => stripeLineItems([{ productId: "framed-poster", selections: { Size: "Huge" }, qty: 1 }]));
+test("rejects quoted programs, pieces opening later and unknown options", () => {
+  assert.throws(() => stripeLineItems([{ productId: "team-recognition", selections: { Format: "Program" }, qty: 25 }]));
+  assert.throws(() => stripeLineItems([{ productId: "founder-edition", selections: { Format: "Founder" }, qty: 1 }]));
+  assert.throws(() => stripeLineItems([{ productId: "digital-entry", selections: { Format: "Huge" }, qty: 1 }]));
 });
 
 test("creates a Stripe Checkout Session with server-side prices", async () => {
@@ -88,7 +90,7 @@ test("creates a Stripe Checkout Session with server-side prices", async () => {
     const response = await worker.fetch(
       new Request("https://shop.test/api/checkout", {
         method: "POST",
-        body: JSON.stringify({ lines: [{ productId: "eagles-player-card", selections: { Format: "Player card" }, qty: 3, details: { "Athlete name": "Pat" } }] }),
+        body: JSON.stringify({ lines: [{ productId: "eagles-signature", selections: { Format: "Signature" }, qty: 3, details: { "Athlete name": "Pat" } }] }),
       }),
       { STRIPE_SECRET_KEY: "sk_test_x", ASSETS: { fetch: async () => new Response("", { status: 404 }) } },
     );
@@ -96,7 +98,7 @@ test("creates a Stripe Checkout Session with server-side prices", async () => {
     assert.equal((await response.json()).url, "https://checkout.stripe.com/c/test");
     assert.equal(sent.url, "https://api.stripe.com/v1/checkout/sessions");
     assert.equal(sent.auth, "Bearer sk_test_x");
-    assert.equal(sent.body.get("line_items[0][price_data][unit_amount]"), "3500");
+    assert.equal(sent.body.get("line_items[0][price_data][unit_amount]"), "2500");
     assert.equal(sent.body.get("line_items[0][quantity]"), "3");
     assert.equal(sent.body.get("shipping_address_collection[allowed_countries][0]"), "US");
   } finally {

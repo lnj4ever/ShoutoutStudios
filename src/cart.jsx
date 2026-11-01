@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
-import { findProduct, unitPrice } from "./catalog.js";
+import { findProduct, isOrderable, unitPrice } from "./catalog.js";
 
 const KEY = "shoutout-cart-v1";
 const CartContext = createContext(null);
@@ -7,7 +7,7 @@ const CartContext = createContext(null);
 function load() {
   try {
     const lines = JSON.parse(localStorage.getItem(KEY) || "[]");
-    return Array.isArray(lines) ? lines.filter((l) => findProduct(l.productId)) : [];
+    return Array.isArray(lines) ? lines.filter((l) => isOrderable(findProduct(l.productId))) : [];
   } catch {
     return [];
   }

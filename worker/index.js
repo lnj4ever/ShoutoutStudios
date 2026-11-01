@@ -1,4 +1,4 @@
-import { findProduct, unitPrice } from "../src/catalog.js";
+import { findProduct, isOrderable, unitPrice } from "../src/catalog.js";
 
 // POST /api/checkout creates a Stripe Checkout Session when STRIPE_SECRET_KEY is set as a host secret.
 // Only used when COMMERCE.STRIPE_ENABLED is true in src/commerce.js.
@@ -7,7 +7,7 @@ export function stripeLineItems(lines) {
   const items = [];
   for (const l of lines) {
     const p = findProduct(l?.productId);
-    if (!p || p.inquiry) throw new Error("One of the items in your cart can't be bought online.");
+    if (!isOrderable(p)) throw new Error("One of the items in your cart can't be bought online.");
     const selections = {};
     for (const o of p.options) {
       const chosen = l.selections?.[o.name];
