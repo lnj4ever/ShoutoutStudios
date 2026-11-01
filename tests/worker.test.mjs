@@ -1,7 +1,9 @@
 import assert from "node:assert/strict";
 import { access } from "node:fs/promises";
 import test from "node:test";
-import worker, { stripeLineItems } from "../worker/index.js";
+import worker, { cleanSignup, stripeLineItems } from "../worker/index.js";
+import { PLAYERS } from "../src/players.js";
+import { findProduct } from "../src/catalog.js";
 
 test("serves existing static assets without a fallback", async () => {
   const calls = [];
@@ -101,6 +103,41 @@ test("creates a Stripe Checkout Session with server-side prices", async () => {
     assert.equal(sent.body.get("line_items[0][price_data][unit_amount]"), "2500");
     assert.equal(sent.body.get("line_items[0][quantity]"), "3");
     assert.equal(sent.body.get("shipping_address_collection[allowed_countries][0]"), "US");
+  } finally {
+    globalThis.fetch = realFetch;
+  }
+});
+
+test("every featured athlete's ladder points at real products", () => {
+  for (const p of PLAYERS) {
+    for (const row of p.ladder) {
+      const product = findProduct(row.product);
+      assert.ok(product, `${p.id}: ${row.product}`);
+      if (row.option) assert.ok(product.options[0].values.some((v) => v.label === row.option), `${p.id}: ${row.option}`);
+    }
+  }
+});
+
+test("free card signup validates and forwards to the webhook", async () => {
+  assert.throws(() => cleanSignup({ name: "Pat", email: "nope", playerId: "x" }));
+  assert.equal(cleanSignup({ name: "Pat", email: "A@B.co", phone: "", consent: true, playerId: "x" }).textConsent, false);
+
+  const env = { ASSETS: { fetch: async () => new Response("", { status: 404 }) } };
+  const post = (body, e) => worker.fetch(new Request("https://shop.test/api/signup", { method: "POST", body: JSON.stringify(body) }), e);
+  assert.equal((await post({ name: "Pat", email: "pat@example.com", playerId: "x" }, env)).status, 501);
+
+  const realFetch = globalThis.fetch;
+  let sent;
+  globalThis.fetch = async (url, init) => {
+    sent = { url, body: JSON.parse(init.body) };
+    return new Response("ok");
+  };
+  try {
+    const res = await post({ name: "Pat Lee", email: "pat@example.com", phone: "954-555-0100", consent: true, playerId: "pw14-marcus-reed" }, { ...env, SIGNUP_WEBHOOK_URL: "https://hooks.test/abc" });
+    assert.equal(res.status, 200);
+    assert.equal(sent.url, "https://hooks.test/abc");
+    assert.equal(sent.body.playerId, "pw14-marcus-reed");
+    assert.equal(sent.body.textConsent, true);
   } finally {
     globalThis.fetch = realFetch;
   }

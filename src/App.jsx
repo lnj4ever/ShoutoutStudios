@@ -2,15 +2,18 @@ import React, { useEffect, useRef, useState } from "react";
 import { CartProvider, useCart } from "./cart.jsx";
 import { Link, Wordmark } from "./ui.jsx";
 import { FAMILIES } from "./catalog.js";
+import { BigExposurePage, PlayerPage, PlayersIndex } from "./athlete.jsx";
 import { About, Audience, CartLines, CartPage, CheckoutPreview, CollectionPage, Home, HowItWorks, NotFound, OrderResult, PartnerPage, Product, Shop } from "./pages.jsx";
 
 const NAV = [
   ["collection/eagles-football-26", "Eagles ’26"],
   ["shop", "Shop"],
+  ["players", "Featured"],
   ["how-it-works", "How It Works"],
   ["families", "Families"],
   ["programs", "Programs"],
   ["sponsors", "Sponsors"],
+  ["big-exposure", "Big Exposure"],
 ];
 
 const TITLES = {
@@ -24,6 +27,9 @@ const TITLES = {
   about: "About",
   cart: "Cart",
   collection: "MSD Eagles Football ’26",
+  players: "Featured Athletes",
+  player: "Featured Athlete",
+  "big-exposure": "Big Exposure Athletics",
 };
 
 function useRoute() {
@@ -60,6 +66,9 @@ function Page({ path, query }) {
     case "sponsors": return <Audience key={head} kind={head} />;
     case "partner": return <PartnerPage key={query.toString()} query={query} />;
     case "about": return <About />;
+    case "players": return <PlayersIndex />;
+    case "player": return <PlayerPage key={arg} id={arg} />;
+    case "big-exposure": return <BigExposurePage />;
     default: return <NotFound />;
   }
 }
@@ -75,7 +84,7 @@ function Header({ path }) {
         <Link to="" className="brand"><Wordmark /></Link>
         <nav className={`nav${menu ? " open" : ""}`} aria-label="Main">
           {NAV.map(([to, label]) => (
-            <Link key={to} to={to} aria-current={path === to || head === to || (to === "shop" && head === "product") ? "page" : undefined}>{label}</Link>
+            <Link key={to} to={to} aria-current={path === to || head === to || (to === "shop" && head === "product") || (to === "players" && head === "player") ? "page" : undefined}>{label}</Link>
           ))}
         </nav>
         <div className="header-actions">
@@ -134,6 +143,13 @@ function Footer() {
           <Wordmark />
           <p className="foot-line">Moments happen once. Shoutouts last.</p>
           <p className="fine">Every athlete has a story worth collecting.</p>
+          <Link to="big-exposure" className="foot-be">
+            <span>
+              <span className="be-kicker">Powered by</span>
+              <strong>Big Exposure Athletics</strong>
+              <span className="be-tag">Scout. Rank. Recognize.</span>
+            </span>
+          </Link>
         </div>
         <div>
           <span className="foot-h">Shop</span>
@@ -151,6 +167,8 @@ function Footer() {
           <Link to="families">Families</Link>
           <Link to="programs">Athletic programs</Link>
           <Link to="sponsors">Sponsors</Link>
+          <Link to="players">Featured athletes</Link>
+          <Link to="big-exposure">Big Exposure Athletics</Link>
         </div>
       </div>
       <div className="wrap foot-base">© {new Date().getFullYear()} Shoutout Studios · Curated, not templated.</div>

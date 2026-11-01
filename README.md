@@ -41,3 +41,9 @@ To go live:
 Team Set Fundraiser, Program Season Recap and Sponsor Spotlight are sold by conversation and show "Ask about this piece".
 
 The earlier Selldone checkout is still in `src/selldone.js`; set `SELLDONE_ENABLED = true` in `src/commerce.js` to switch back.
+
+## Featured athletes and free card signups
+
+`src/players.js` holds the featured athlete pages (`#/player/<id>`), one per Big Exposure Athletics feature. The athletes there are fictional samples; publish real athletes only with the family's written consent.
+
+The free digital card form posts to `POST /api/signup` on the Worker, which forwards each signup as JSON to the URL in the `SIGNUP_WEBHOOK_URL` Worker secret (for example a Zapier, Make or Google Sheets webhook). Until that secret is set, the form tells visitors signups open when the site goes live.

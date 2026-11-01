@@ -78,10 +78,49 @@ async function createStripeCheckout(request, env) {
   return Response.json({ url: data.url });
 }
 
+// POST /api/signup: free digital card signups from featured athlete pages.
+// Forwards the signup as JSON to SIGNUP_WEBHOOK_URL (a Zapier, Make or Google Sheets webhook, set as a
+// Worker secret). Returns 501 until that secret exists.
+export function cleanSignup(body) {
+  const str = (v, max) => (typeof v === "string" ? v.trim().slice(0, max) : "");
+  const s = {
+    name: str(body?.name, 120),
+    email: str(body?.email, 200).toLowerCase(),
+    phone: str(body?.phone, 30),
+    textConsent: body?.consent === true && !!str(body?.phone, 30),
+    playerId: str(body?.playerId, 80),
+    player: str(body?.player, 120),
+    feature: str(body?.feature, 120),
+  };
+  if (!s.name) throw new Error("Add your name.");
+  if (!/^\S+@\S+\.\S+$/.test(s.email)) throw new Error("Enter a valid email.");
+  if (s.phone && s.phone.replace(/\D/g, "").length < 10) throw new Error("Enter a 10-digit phone number.");
+  if (!s.playerId) throw new Error("Missing athlete.");
+  return s;
+}
+
+async function signup(request, env) {
+  if (!env.SIGNUP_WEBHOOK_URL) return Response.json({ error: "Signups are not configured." }, { status: 501 });
+  let s;
+  try {
+    s = cleanSignup(await request.json());
+  } catch (e) {
+    return Response.json({ error: e instanceof SyntaxError ? "Invalid request." : e.message }, { status: 400 });
+  }
+  const res = await fetch(env.SIGNUP_WEBHOOK_URL, {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ ...s, source: "free-digital-card", at: new Date().toISOString() }),
+  });
+  if (!res.ok) return Response.json({ error: "We couldn't save that just now. Please try again." }, { status: 502 });
+  return Response.json({ ok: true });
+}
+
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
     if (url.pathname === "/api/checkout" && request.method === "POST") return createStripeCheckout(request, env);
+    if (url.pathname === "/api/signup" && request.method === "POST") return signup(request, env);
 
     const response = await env.ASSETS.fetch(request);
     const acceptsHtml = request.headers.get("accept")?.includes("text/html");

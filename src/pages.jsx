@@ -834,7 +834,7 @@ function PartnerForm({ defaultInterest, bare }) {
       <fieldset className="opt">
         <legend>I'm interested in</legend>
         <div className="chips">
-          {[["program", "A program partnership"], ["sponsor", "Sponsoring a collection"], ["bulk", "A large team order"], ["other", "Something else"]].map(([k, l]) => (
+          {[["program", "A program partnership"], ["sponsor", "Sponsoring a collection"], ["bulk", "A large team order"], ["coverage", "Big Exposure game coverage"], ["other", "Something else"]].map(([k, l]) => (
             <label key={k} className={v.interest === k ? "on" : ""}>
               <input type="radio" name="interest" checked={v.interest === k} onChange={() => setV({ ...v, interest: k })} />{l}
             </label>

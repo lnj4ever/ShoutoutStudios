@@ -44,7 +44,7 @@ export const CATEGORIES = ["All", ...FAMILIES.map((f) => f.name)];
 
 // Sample school palettes show the dual-brand rule: the collectible wears the school's colors,
 // the studio chrome stays Ink / Ivory / Purple / Gold.
-const SCHOOLS = {
+export const SCHOOLS = {
   maroon: { school: "Westbrook", mascot: "Eagles", c1: "#6E1A2B", c2: "#E9E2D6" },
   royal: { school: "Lakeview", mascot: "Knights", c1: "#1E3A7A", c2: "#C9CCD1" },
   green: { school: "Cedar Ridge", mascot: "Pioneers", c1: "#1F4D36", c2: "#E3C878" },
