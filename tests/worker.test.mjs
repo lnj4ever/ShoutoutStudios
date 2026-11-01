@@ -69,7 +69,7 @@ test("prices Stripe lines from the catalog, not the browser", () => {
   const [item] = stripeLineItems([{ productId: "digital-entry", selections: { Format: "Five-card pack" }, qty: 2, unitAmount: 1, details: { "Athlete name": "Pat" } }]);
   assert.equal(item.unitAmount, 1500);
   assert.equal(item.quantity, 2);
-  assert.equal(item.name, "Digital Card (Five-card pack)");
+  assert.equal(item.name, "Digital Entry (Five-card pack)");
   assert.equal(item.shippable, false);
 });
 
@@ -90,7 +90,7 @@ test("creates a Stripe Checkout Session with server-side prices", async () => {
     const response = await worker.fetch(
       new Request("https://shop.test/api/checkout", {
         method: "POST",
-        body: JSON.stringify({ lines: [{ productId: "eagles-signature", selections: { Format: "Signature" }, qty: 3, details: { "Athlete name": "Pat" } }] }),
+        body: JSON.stringify({ lines: [{ productId: "eagles-signature", selections: { Format: "Base / Signature" }, qty: 3, details: { "Athlete name": "Pat" } }] }),
       }),
       { STRIPE_SECRET_KEY: "sk_test_x", ASSETS: { fetch: async () => new Response("", { status: 404 }) } },
     );
