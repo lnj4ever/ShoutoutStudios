@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { access } from "node:fs/promises";
 import test from "node:test";
-import worker from "../worker/index.js";
+import worker, { stripeLineItems } from "../worker/index.js";
 
 test("serves existing static assets without a fallback", async () => {
   const calls = [];
@@ -63,4 +63,16 @@ test("does not turn missing API or write requests into the app shell", async () 
 
 test("build emits the static site", async () => {
   await access(new URL("../dist/client/index.html", import.meta.url));
+});
+
+test("prices Stripe lines from the catalog, not the browser", () => {
+  const [item] = stripeLineItems([{ productId: "framed-poster", selections: { Size: "11 × 14 in" }, qty: 2, unitAmount: 1, details: { "Athlete name": "Pat" } }]);
+  assert.equal(item.unitAmount, 7500);
+  assert.equal(item.quantity, 2);
+  assert.equal(item.name, "Framed Poster (11 × 14 in)");
+});
+
+test("rejects inquiry-only products and unknown options", () => {
+  assert.throws(() => stripeLineItems([{ productId: "sponsor-spotlight", selections: { Format: "Sponsor" }, qty: 1 }]));
+  assert.throws(() => stripeLineItems([{ productId: "framed-poster", selections: { Size: "Huge" }, qty: 1 }]));
 });

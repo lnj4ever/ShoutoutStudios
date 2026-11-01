@@ -8,10 +8,11 @@
 //   2. Set SHOPIFY_STORE_DOMAIN and add `shopifyVariants` to each product in catalog.js.
 //   Checkout uses a Shopify cart permalink; athlete details travel in the order note.
 //
-// Stripe (alternative): set STRIPE_ENABLED = true and add STRIPE_SECRET_KEY as a secret on the
-//   host. The worker's /api/checkout creates a Stripe Checkout Session from the cart.
+// Stripe (alternative): set SELLDONE_ENABLED = false, STRIPE_ENABLED = true, and add
+//   STRIPE_SECRET_KEY as a secret on the Cloudflare Worker. The worker's /api/checkout prices the
+//   cart from catalog.js and creates a Stripe Checkout Session; no separate server is needed.
 
-import { findProduct, unitPrice } from "./catalog.js";
+import { findProduct } from "./catalog.js";
 
 export const COMMERCE = {
   SELLDONE_ENABLED: true,
@@ -61,18 +62,8 @@ export async function startCheckout(lines) {
     const res = await fetch("/api/checkout", {
       method: "POST",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({
-        origin: window.location.origin,
-        lines: lines.map((l) => {
-          const p = findProduct(l.productId);
-          return {
-            name: `${p.name} — ${Object.values(l.selections).join(", ")}`,
-            description: detailsText(l).slice(0, 480) || p.tagline,
-            unitAmount: Math.round(unitPrice(p, l.selections) * 100),
-            quantity: l.qty,
-          };
-        }),
-      }),
+      // The worker prices each line from the catalog; only ids, options and quantities are sent.
+      body: JSON.stringify({ lines: lines.map(({ productId, selections, qty, details }) => ({ productId, selections, qty, details })) }),
     });
     const data = await res.json().catch(() => ({}));
     if (!res.ok || !data.url) throw new Error(data.error || "Checkout could not start.");
