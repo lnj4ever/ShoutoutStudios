@@ -463,7 +463,16 @@ main:focus { outline: none; }
 }
 .center-actions { justify-content: center; margin-top: 0; }
 .be-strip-links { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; }
-.be-ig { color: var(--gold); font-weight: 600; font-size: .9rem; text-decoration: none; }
-.be-ig:hover { text-decoration: underline; }
-.be-social { color: var(--gold); }
-.site-footer .be-social { display: block; margin-top: 8px; }
+
+/* Big Exposure social links */
+.socials { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 10px; }
+.socials a { display: inline-flex; align-items: center; gap: 8px; text-decoration: none; transition: color .2s, background .2s, border-color .2s, transform .2s; }
+.socials-icons a { width: 40px; height: 40px; justify-content: center; border-radius: 50%; border: 1.5px solid rgba(176, 141, 58, .55); color: var(--gold); --icon-cut: var(--ink); }
+.socials-icons a:hover { background: var(--gold); color: var(--ink); --icon-cut: var(--gold); transform: translateY(-1px); }
+.socials-buttons { justify-content: center; margin: 8px 0 20px; }
+.socials-buttons a { min-height: 48px; padding: 0 20px; border-radius: var(--radius); background: var(--ink); color: var(--ivory); font-weight: 600; font-size: .95rem; --icon-cut: var(--ink); }
+.socials-buttons a .social-icon { color: var(--gold); }
+.socials-buttons a:hover { background: var(--graphite); --icon-cut: var(--graphite); transform: translateY(-1px); }
+.be-hero-social { margin-top: 24px; }
+.foot-social { margin-top: 14px; }
+.foot-social a { width: 36px; height: 36px; }

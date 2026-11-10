@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { CartProvider, useCart } from "./cart.jsx";
 import { Link, Wordmark } from "./ui.jsx";
+import { SocialLinks } from "./social.jsx";
 import { FAMILIES } from "./catalog.js";
 import { BigExposurePage, PlayerPage, PlayersIndex } from "./athlete.jsx";
 import { About, Audience, CartLines, CartPage, CheckoutPreview, CollectionPage, Home, HowItWorks, NotFound, OrderResult, PartnerPage, Product, Shop } from "./pages.jsx";
@@ -150,7 +151,7 @@ function Footer() {
               <span className="be-tag">Scout. Rank. Recognize.</span>
             </span>
           </Link>
-          <span className="be-social"><a className="be-ig" href="https://www.instagram.com/bigexposureathletics" target="_blank" rel="noopener noreferrer">Instagram</a> · <a className="be-ig" href="https://www.tiktok.com/@bigexposureathletics" target="_blank" rel="noopener noreferrer">TikTok</a> · <a className="be-ig" href="https://www.youtube.com/@bigexposureathletics" target="_blank" rel="noopener noreferrer">YouTube</a></span>
+          <SocialLinks className="foot-social" />
         </div>
         <div>
           <span className="foot-h">Shop</span>
