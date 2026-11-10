@@ -7,6 +7,7 @@ import { NotFound, PageIntro } from "./pages.jsx";
 
 export const BE_INSTAGRAM = "https://www.instagram.com/bigexposureathletics";
 export const BE_YOUTUBE = "https://www.youtube.com/@bigexposureathletics";
+export const BE_TIKTOK = "https://www.tiktok.com/@bigexposureathletics";
 
 const windowText = (iso) => {
   const d = new Date(`${iso}T23:59:00`);
@@ -259,7 +260,7 @@ function BigExposureStrip() {
         <p>Every featured athlete is captured and covered by Big Exposure Athletics, a Shoutout Studios company.</p>
         <div className="be-strip-links">
           <Button to="big-exposure" variant="ghost">Meet Big Exposure</Button>
-          <span className="be-social"><a className="be-ig" href={BE_INSTAGRAM} target="_blank" rel="noopener noreferrer">Instagram</a> · <a className="be-ig" href={BE_YOUTUBE} target="_blank" rel="noopener noreferrer">YouTube</a></span>
+          <span className="be-social"><a className="be-ig" href={BE_INSTAGRAM} target="_blank" rel="noopener noreferrer">Instagram</a> · <a className="be-ig" href={BE_TIKTOK} target="_blank" rel="noopener noreferrer">TikTok</a> · <a className="be-ig" href={BE_YOUTUBE} target="_blank" rel="noopener noreferrer">YouTube</a></span>
         </div>
       </div>
     </section>
@@ -326,11 +327,12 @@ export function BigExposurePage() {
         <div className="wrap">
           <p className="eyebrow light">A Shoutout Studios company</p>
           <h1>Big Exposure <span>Athletics</span></h1>
-          <p className="lede">South Florida's high school sports media platform, covering Miami-Dade, Broward and Palm Beach. Big Exposure captures the moments. Shoutout Studios makes them collectible.</p>
+          <p className="lede">A sports media and promotional brand highlighting South Florida's athletes, teams and sports moments across Miami-Dade, Broward and Palm Beach. Big Exposure captures the moments. Shoutout Studios makes them collectible.</p>
           <div className="actions">
             <Button to="partner?interest=coverage">Book game coverage</Button>
             <Button to="players" variant="ghost">See featured athletes</Button>
             <a className="btn btn-ghost" href={BE_INSTAGRAM} target="_blank" rel="noopener noreferrer">Instagram</a>
+            <a className="btn btn-ghost" href={BE_TIKTOK} target="_blank" rel="noopener noreferrer">TikTok</a>
             <a className="btn btn-ghost" href={BE_YOUTUBE} target="_blank" rel="noopener noreferrer">YouTube</a>
           </div>
         </div>
@@ -407,9 +409,10 @@ export function BigExposurePage() {
       <section className="band ivory tight">
         <div className="wrap center">
           <h2>Follow the season.</h2>
-          <p className="lede center-lede">Weekly features and spotlights on Instagram, and highlight reels and game coverage on YouTube.</p>
+          <p className="lede center-lede">Athletes, teams and sports moments, every week on Instagram and TikTok (@bigexposureathletics), with highlight reels and game coverage on YouTube.</p>
           <div className="actions center-actions">
             <a className="btn btn-primary" href={BE_INSTAGRAM} target="_blank" rel="noopener noreferrer">Follow @bigexposureathletics</a>
+            <a className="btn btn-primary" href={BE_TIKTOK} target="_blank" rel="noopener noreferrer">Watch on TikTok</a>
             <a className="btn btn-primary" href={BE_YOUTUBE} target="_blank" rel="noopener noreferrer">Watch on YouTube</a>
             <Button to="players" variant="secondary">Browse featured athletes</Button>
           </div>
