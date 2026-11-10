@@ -5,6 +5,9 @@ import { useCart } from "./cart.jsx";
 import { Button, CardArt, Link, SectionHead, Seal, TierBadge } from "./ui.jsx";
 import { NotFound, PageIntro } from "./pages.jsx";
 
+export const BE_INSTAGRAM = "https://www.instagram.com/bigexposureathletics";
+export const BE_YOUTUBE = "https://www.youtube.com/@bigexposureathletics";
+
 const windowText = (iso) => {
   const d = new Date(`${iso}T23:59:00`);
   if (Number.isNaN(d.getTime()) || d < new Date()) return null;
@@ -254,7 +257,10 @@ function BigExposureStrip() {
           <span className="be-tag">Scout. Rank. Recognize.</span>
         </div>
         <p>Every featured athlete is captured and covered by Big Exposure Athletics, a Shoutout Studios company.</p>
-        <Button to="big-exposure" variant="ghost">Meet Big Exposure</Button>
+        <div className="be-strip-links">
+          <Button to="big-exposure" variant="ghost">Meet Big Exposure</Button>
+          <span className="be-social"><a className="be-ig" href={BE_INSTAGRAM} target="_blank" rel="noopener noreferrer">Instagram</a> · <a className="be-ig" href={BE_YOUTUBE} target="_blank" rel="noopener noreferrer">YouTube</a></span>
+        </div>
       </div>
     </section>
   );
@@ -324,6 +330,8 @@ export function BigExposurePage() {
           <div className="actions">
             <Button to="partner?interest=coverage">Book game coverage</Button>
             <Button to="players" variant="ghost">See featured athletes</Button>
+            <a className="btn btn-ghost" href={BE_INSTAGRAM} target="_blank" rel="noopener noreferrer">Instagram</a>
+            <a className="btn btn-ghost" href={BE_YOUTUBE} target="_blank" rel="noopener noreferrer">YouTube</a>
           </div>
         </div>
       </section>
@@ -399,8 +407,12 @@ export function BigExposurePage() {
       <section className="band ivory tight">
         <div className="wrap center">
           <h2>Follow the season.</h2>
-          <p className="lede center-lede">Find Big Exposure Athletics on Instagram for weekly features, and on YouTube for highlight reels and game coverage.</p>
-          <Button to="players">Browse featured athletes</Button>
+          <p className="lede center-lede">Weekly features and spotlights on Instagram, and highlight reels and game coverage on YouTube.</p>
+          <div className="actions center-actions">
+            <a className="btn btn-primary" href={BE_INSTAGRAM} target="_blank" rel="noopener noreferrer">Follow @bigexposureathletics</a>
+            <a className="btn btn-primary" href={BE_YOUTUBE} target="_blank" rel="noopener noreferrer">Watch on YouTube</a>
+            <Button to="players" variant="secondary">Browse featured athletes</Button>
+          </div>
         </div>
       </section>
     </>

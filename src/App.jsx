@@ -150,6 +150,7 @@ function Footer() {
               <span className="be-tag">Scout. Rank. Recognize.</span>
             </span>
           </Link>
+          <span className="be-social"><a className="be-ig" href="https://www.instagram.com/bigexposureathletics" target="_blank" rel="noopener noreferrer">Instagram</a> · <a className="be-ig" href="https://www.youtube.com/@bigexposureathletics" target="_blank" rel="noopener noreferrer">YouTube</a></span>
         </div>
         <div>
           <span className="foot-h">Shop</span>
